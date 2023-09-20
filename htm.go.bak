@@ -14,23 +14,19 @@ type Safe struct {
 func Element(tag string, attr Safe, body Safe) Safe {
 	//smaller fragments are concatenated as soon as available, larger ones are defered
 	ss := make([]string, 0, len(body.frag)+2)
-	var result Safe
 	if len(attr.frag) > 0 {
-		result = AsIs("<"+tag+" "+strings.Join(attr.frag, "")+"\n>")
-//		ss = append(ss, "<"+tag+" "+strings.Join(attr.frag, "")+"\n>")
+		ss = append(ss, strings.Join([]string{"<", tag, " ", strings.Join(attr.frag, ""), "\n>"}, ""))
 	} else {
-		result = AsIs("<"+tag+">")
-//		ss = append(ss, "<"+tag+">")
+		ss = append(ss, strings.Join([]string{"<", tag, ">"}, ""))
 	}
-//	ss = append(ss, body.frag...)
-//	ss = append(ss, "</"+tag+">")
-//	return Safe{ss}
-	return Concat(Safe{ss}, result, body, AsIs("</"+tag+">"))
+	ss = append(ss, body.frag...)
+	ss = append(ss, strings.Join([]string{"</", tag, ">"}, ""))
+	return Safe{ss}
 }
 
 //create HTML tag with no closing, e.g. <input type="text">
 func VoidElement(tag string, attr Safe) Safe {
-	return AsIs("<"+tag+" "+strings.Join(attr.frag, "")+"\n>")
+	return Safe{[]string{strings.Join([]string{"<", tag, " ", strings.Join(attr.frag, ""), "\n>"}, "")}}
 }
 
 func Concat(dst Safe, src ...Safe) Safe {
