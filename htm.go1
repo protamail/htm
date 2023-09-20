@@ -1,0 +1,82 @@
+package htm
+
+import (
+	//    "fmt"
+	"html"
+	"strings"
+)
+
+func Body(body ...Safe) Safe {
+	switch len(body) {
+	case 0:
+		return Safe{}
+	case 1:
+		return body[0]
+	}
+	l := 0
+	for _, s := range body {
+		l += len(s.frag)
+	}
+	result := Safe{make([]string, 0, l)}
+	for _, s := range body {
+		result.frag = append(result.frag, s.frag...)
+	}
+	return result;
+}
+
+func Tag(tag string, attr string, body Safe) Safe {
+	ss := make([]string, 0, len(body.frag)+8)
+	ss = append(ss, "<", tag)
+	if len(attr) > 0 {
+		ss = append(ss, " ", attr, "\n>")
+	} else {
+		ss = append(ss, ">")
+	}
+	ss = append(ss, body.frag...)
+	ss = append(ss, "</", tag, ">")
+	return Safe{ss}
+}
+
+func VoidTag(tag string, attr string) Safe {
+	return Safe{[]string{"<", tag, " ", attr, "\n>"}}
+}
+
+type Safe struct {
+	frag []string
+}
+
+func (c *Safe) Append(e Safe) *Safe {
+	if cap(c.frag)-len(c.frag) < len(e.frag) {
+		l := len(e.frag)
+		if len(c.frag)*2 > l {
+			l = len(c.frag) * 2
+		}
+		c1 := make([]string, 0, l)
+		c1 = append(c1, c.frag...)
+		c.frag = append(c1, e.frag...)
+	} else {
+		c.frag = append(c.frag, e.frag...)
+	}
+	return c
+}
+
+func (c Safe) String() string {
+	return strings.Join(c.frag, "")
+}
+
+func AsIs(a ...string) Safe {
+	return Safe{a}
+}
+
+// Used to output HTML text, escaping HTML reserved characters <>&"
+func Escape(a string) Safe {
+	return Safe{[]string{html.EscapeString(a)}}
+}
+
+func URLEscape(a string) Safe {
+	return Safe{}
+}
+
+func JSStrEscape(a string) Safe {
+	return Safe{}
+}

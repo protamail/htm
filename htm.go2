@@ -1,0 +1,110 @@
+package htm
+
+import (
+	//    "fmt"
+	"html"
+	"strings"
+)
+
+type Safe string
+
+func Body(body ...[]Safe) []Safe {
+	switch len(body) {
+	case 0:
+		return []Safe{}
+	case 1:
+		return body[0]
+	}
+	l := 0
+	for _, s := range body {
+		l += len(s)
+	}
+	result := make([]Safe, l)
+	i := 0
+	for _, s := range body {
+		for _, s1 := range s {
+			result[i] = s1
+			i++
+		}
+	}
+	return result;
+}
+
+func Tag(tag string, attr string, body []Safe) []Safe {
+	ss := make([]Safe, len(body)+8)
+	i := 0
+	ss[i] = Safe("<")
+	i++
+	ss[i] = Safe(tag)
+	i++
+	if len(attr) > 0 {
+		ss[i] = Safe(" ")
+		i++
+		ss[i] = Safe(attr)
+		i++
+		ss[i] = Safe("\n>")
+		i++
+	} else {
+		ss[i] = Safe(">")
+		i++
+	}
+	for _, s := range body {
+		ss[i] = s
+		i++
+	}
+	ss[i] = Safe("</")
+	i++
+	ss[i] = Safe(tag)
+	i++
+	ss[i] = Safe(">")
+	i++
+	return ss
+}
+
+func VoidTag(tag string, attr string) []Safe {
+	return []Safe{"<", Safe(tag), " ", Safe(attr), "\n>"}
+}
+
+func Append(c []Safe, e []Safe) []Safe {
+	if cap(c)-len(c) < len(e) {
+		l := len(e)
+		if len(c)*2 > l {
+			l = len(c) * 2
+		}
+		c1 := make([]Safe, 0, l)
+		c1 = append(c1, c...)
+		c = append(c1, e...)
+	} else {
+		c = append(c, e...)
+	}
+	return c
+}
+
+func String(c []Safe) string {
+	var b strings.Builder
+	for _, s := range c {
+		b.WriteString(string(s))
+	}
+	return b.String()
+}
+
+func AsIs(a ...string) []Safe {
+	s := make([]Safe, len(a))
+	for i, a1 := range a {
+		s[i] = Safe(a1)
+	}
+	return s
+}
+
+// Used to output HTML text, escaping HTML reserved characters <>&"
+func Escape(a string) Safe {
+	return Safe(html.EscapeString(a))
+}
+
+func URLEscape(a string) []Safe {
+	return []Safe{}
+}
+
+func JSStrEscape(a string) []Safe {
+	return []Safe{}
+}
