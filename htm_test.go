@@ -2,7 +2,7 @@ package htm_test
 
 import (
 	"fmt"
-	"bk/htm"
+	"htm"
 	"strconv"
 	_ "strings"
 	"testing"
