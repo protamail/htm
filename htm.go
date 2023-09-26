@@ -48,15 +48,12 @@ func VoidElement(tag string, attr Attr) Safe {
 	return Safe{[]string{"<" + tag + " " + string(attr) + "\n>"}}
 }
 
-func Join(dst Safe, src ...Safe) Safe {
-	for _, s := range src {
-		if len(s.frag) > 1 {
-			dst.frag = append(dst.frag, strings.Join(s.frag, ""))
-		} else {
-			dst.frag = append(dst.frag, s.frag...)
-		}
+func Join(ss ...Safe) Safe {
+	r := make([]string, 0, len(ss));
+	for _, s := range ss {
+		r = append(r, strings.Join(s.frag, ""))
 	}
-	return dst
+	return Safe{r}
 }
 
 func (c Safe) String() string {

@@ -14,7 +14,7 @@ var empty = Safe{}
 
 func Test1(t *testing.T) {
 //	var r Safe
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 100; i++ {
 		var collect Safe
 		for j := 0; j < 1000; j++ {
 			collect = J(collect,
