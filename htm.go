@@ -8,22 +8,24 @@ import (
 
 // contains well-formed HTML fragment
 type HTML struct {
-	before string
-	body   string
-	after  string
+	html [3]string
 }
 
 type Attr string
 
+func NewHTML(body string) HTML {
+	return HTML{[3]string{"", body, ""}}
+}
+
 func Element(tag string, attr Attr, body HTML) HTML {
 	h := HTML{}
 	if len(attr) > 0 {
-		h.before = "<" + tag + " " + string(attr) + "\n>" + body.before
+		h.html[0] = "<" + tag + " " + string(attr) + "\n>" + body.html[0]
 	} else {
-		h.before = "<" + tag + ">" + body.before
+		h.html[0] = "<" + tag + ">" + body.html[0]
 	}
-	h.body = body.body
-	h.after = body.after + "</" + tag + ">"
+	h.html[1] = body.html[1]
+	h.html[2] = body.html[2] + "</" + tag + ">"
 	return h
 }
 
@@ -46,7 +48,7 @@ func Attributes(kv ...string) Attr {
 
 // create HTML tag with no closing, e.g. <input type="text">
 func VoidElement(tag string, attr Attr) HTML {
-	return HTML{"", "<" + tag + " " + string(attr) + "\n>", ""}
+	return NewHTML("<" + tag + " " + string(attr) + "\n>")
 }
 
 func Join(frags ...HTML) HTML {
@@ -58,42 +60,42 @@ func Join(frags ...HTML) HTML {
 	}
 
 	first := frags[0]
-	n := len(first.body) + len(first.after)
+	n := len(first.html[1]) + len(first.html[2])
 	for _, frag := range frags[1:] {
-		n += len(frag.before) + len(frag.body) + len(frag.after)
+		n += len(frag.html[0]) + len(frag.html[1]) + len(frag.html[2])
 	}
 
 	var b strings.Builder
 	b.Grow(n)
-	b.WriteString(first.body)
-	b.WriteString(first.after)
+	b.WriteString(first.html[1])
+	b.WriteString(first.html[2])
 	for _, frag := range frags[1:] {
-		if len(frag.before) > 0 {
-			b.WriteString(frag.before)
+		if len(frag.html[0]) > 0 {
+			b.WriteString(frag.html[0])
 		}
-		if len(frag.body) > 0 {
-			b.WriteString(frag.body)
+		if len(frag.html[1]) > 0 {
+			b.WriteString(frag.html[1])
 		}
-		if len(frag.after) > 0 {
-			b.WriteString(frag.after)
+		if len(frag.html[2]) > 0 {
+			b.WriteString(frag.html[2])
 		}
 	}
-	first.body = b.String()
-	first.after = ""
+	first.html[1] = b.String()
+	first.html[2] = ""
 	return first
 }
 
 func (c HTML) String() string {
-	return strings.Join([]string{c.before, c.body, c.after}, "")
+	return strings.Join(c.html[:], "")
 }
 
 func AsIs(a ...string) HTML {
-	return HTML{"", strings.Join(a, ""), ""}
+	return NewHTML(strings.Join(a, ""))
 }
 
 // Used to output HTML text, escaping HTML reserved characters <>&"
 func HTMLEncode(a string) HTML {
-	return HTML{"", html.EscapeString(a), ""}
+	return NewHTML(html.EscapeString(a))
 }
 
 var URIComponentEncode = url.QueryEscape
@@ -106,5 +108,5 @@ var jsStringEscaper = strings.NewReplacer(
 )
 
 func JSStringEscape(a string) HTML {
-	return HTML{"", jsStringEscaper.Replace(a), ""}
+	return NewHTML(jsStringEscaper.Replace(a))
 }
