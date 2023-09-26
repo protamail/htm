@@ -13,7 +13,7 @@ var H, U, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 var empty = Safe{}
 
 func Test1(t *testing.T) {
-//	var r Safe
+	//	var r Safe
 	for i := 0; i < 100; i++ {
 		var collect Safe
 		for j := 0; j < 1000; j++ {
@@ -44,6 +44,6 @@ func Test1(t *testing.T) {
 				),
 			),
 		)
-//		fmt.Println(r.String())
+		//		fmt.Println(r.String())
 	}
 }

@@ -14,16 +14,15 @@ type Safe struct {
 type Attr string
 
 func Element(tag string, attr Attr, body Safe) Safe {
-	//smaller fragments are concatenated as soon as available, larger ones are deferred
-	ss := make([]string, 0, len(body.frag)+2)
+	ss := make([]string, 0, len(body.frag)+8)
 	if len(attr) > 0 {
-		ss = append(ss, "<"+tag+" "+string(attr)+"\n>")
+		ss = append(ss, "<", tag, " ", string(attr), "\n>")
 	} else {
-		ss = append(ss, "<"+tag+">")
+		ss = append(ss, "<", tag, ">")
 	}
 	ss = append(ss, body.frag...)
-	ss = append(ss, "</"+tag+">")
-	return Safe{ss}
+	ss = append(ss, "</", tag, ">")
+	return Safe{[]string{strings.Join(ss, "")}}
 }
 
 var attrEscaper = strings.NewReplacer(`"`, `&quot;`)
@@ -49,10 +48,11 @@ func VoidElement(tag string, attr Attr) Safe {
 }
 
 func Join(ss ...Safe) Safe {
-	r := make([]string, 0, len(ss));
+	r := make([]string, 0, len(ss))
 	for _, s := range ss {
 		r = append(r, strings.Join(s.frag, ""))
 	}
+	//Join mostly used to accumulate in cycle, so don't join result yet
 	return Safe{r}
 }
 
