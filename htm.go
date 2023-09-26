@@ -8,17 +8,17 @@ import (
 
 // contains well-formed HTML fragment
 type HTML struct {
-	html [3]string
+	html *[3]string
 }
 
 type Attr string
 
 func NewHTML(body string) HTML {
-	return HTML{[3]string{"", body, ""}}
+	return HTML{&[3]string{"", body, ""}}
 }
 
 func Element(tag string, attr Attr, body HTML) HTML {
-	h := HTML{}
+	h := NewHTML("")
 	if len(attr) > 0 {
 		h.html[0] = "<" + tag + " " + string(attr) + "\n>" + body.html[0]
 	} else {
@@ -54,7 +54,7 @@ func VoidElement(tag string, attr Attr) HTML {
 func Join(frags ...HTML) HTML {
 	switch len(frags) {
 	case 0:
-		return HTML{}
+		return NewHTML("")
 	case 1:
 		return frags[0]
 	}
