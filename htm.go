@@ -14,46 +14,38 @@ type HTML struct {
 type Attr string
 
 func Element(tag string, attr Attr, body ...HTML) HTML {
-	ss := make([]string, 0, 9)
+	sar := make([]string, 0, 9)
 	if len(attr) > 0 {
-		ss = append(ss, "<", tag, " ", string(attr), "\n>")
+		sar = append(sar, "<", tag, " ", string(attr), "\n>")
 	} else {
-		ss = append(ss, "<", tag, ">")
+		sar = append(sar, "<", tag, ">")
 	}
-	ss = append(ss, Join(body...).html)
-	ss = append(ss, "</", tag, ">")
-	return HTML{strings.Join(ss, "")}
+	sar = append(sar, Join(body...).html)
+	sar = append(sar, "</", tag, ">")
+	return HTML{strings.Join(sar, "")}
 }
 
 var attrEscaper = strings.NewReplacer(`"`, `&quot;`)
 
 func Attributes(kv ...string) Attr {
-	ss := make([]string, 0, len(kv)*5/2)
+	sar := make([]string, 0, len(kv)*5/2)
 	for i := 1; i < len(kv); i += 2 {
 		if i > 1 {
-			ss = append(ss, ` `)
+			sar = append(sar, ` `)
 		}
 		v := kv[i]
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)
 		}
-		ss = append(ss, kv[i-1], `="`, v, `"`)
+		sar = append(sar, kv[i-1], `="`, v, `"`)
 	}
-	return Attr(strings.Join(ss, ""))
+	return Attr(strings.Join(sar, ""))
 }
 
 // create HTML tag with no closing, e.g. <input type="text">
 func VoidElement(tag string, attr Attr) HTML {
 	return HTML{"<" + tag + " " + string(attr) + "\n>"}
 }
-
-/*func Join(ss ...HTML) HTML {
-	r := make([]string, 0, len(ss))
-	for _, s := range ss {
-		r = append(r, s.html)
-	}
-	return HTML{strings.Join(r, "")}
-}*/
 
 func Join(frags ...HTML) HTML {
 	switch len(frags) {
