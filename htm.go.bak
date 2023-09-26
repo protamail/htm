@@ -8,19 +8,19 @@ import (
 
 // contains well-formed HTML fragments
 type Safe struct {
-	html string
+	frag string
 }
 
 type Attr string
 
-func Element(tag string, attr Attr, body ...Safe) Safe {
+func Element(tag string, attr Attr, body Safe) Safe {
 	ss := make([]string, 0, 9)
 	if len(attr) > 0 {
 		ss = append(ss, "<", tag, " ", string(attr), "\n>")
 	} else {
 		ss = append(ss, "<", tag, ">")
 	}
-	ss = append(ss, Join(body...).html)
+	ss = append(ss, body.frag)
 	ss = append(ss, "</", tag, ">")
 	return Safe{strings.Join(ss, "")}
 }
@@ -50,13 +50,14 @@ func VoidElement(tag string, attr Attr) Safe {
 func Join(ss ...Safe) Safe {
 	r := make([]string, 0, len(ss))
 	for _, s := range ss {
-		r = append(r, s.html)
+		r = append(r, s.frag)
 	}
+	//Join mostly used to accumulate in cycle, so don't join result yet
 	return Safe{strings.Join(r, "")}
 }
 
 func (c Safe) String() string {
-	return c.html
+	return c.frag
 }
 
 func AsIs(a ...string) Safe {
