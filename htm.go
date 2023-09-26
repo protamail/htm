@@ -6,14 +6,14 @@ import (
 	"strings"
 )
 
-// contains well-formed HTML fragments
-type Safe struct {
+// contains well-formed HTML fragment
+type HTML struct {
 	html string
 }
 
 type Attr string
 
-func Element(tag string, attr Attr, body ...Safe) Safe {
+func Element(tag string, attr Attr, body ...HTML) HTML {
 	ss := make([]string, 0, 9)
 	if len(attr) > 0 {
 		ss = append(ss, "<", tag, " ", string(attr), "\n>")
@@ -22,7 +22,7 @@ func Element(tag string, attr Attr, body ...Safe) Safe {
 	}
 	ss = append(ss, Join(body...).html)
 	ss = append(ss, "</", tag, ">")
-	return Safe{strings.Join(ss, "")}
+	return HTML{strings.Join(ss, "")}
 }
 
 var attrEscaper = strings.NewReplacer(`"`, `&quot;`)
@@ -43,32 +43,29 @@ func Attributes(kv ...string) Attr {
 }
 
 // create HTML tag with no closing, e.g. <input type="text">
-func VoidElement(tag string, attr Attr) Safe {
-	return Safe{"<" + tag + " " + string(attr) + "\n>"}
+func VoidElement(tag string, attr Attr) HTML {
+	return HTML{"<" + tag + " " + string(attr) + "\n>"}
 }
 
-/*func Join(ss ...Safe) Safe {
+/*func Join(ss ...HTML) HTML {
 	r := make([]string, 0, len(ss))
 	for _, s := range ss {
 		r = append(r, s.html)
 	}
-	return Safe{strings.Join(r, "")}
+	return HTML{strings.Join(r, "")}
 }*/
 
-func Join(frags ...Safe) Safe {
+func Join(frags ...HTML) HTML {
 	switch len(frags) {
-	case 0:
-		return Safe{}
 	case 1:
-		return Safe{frags[0].html}
+		return frags[0]
+	case 0:
+		return HTML{}
 	}
 
 	var n int
 	for _, frag := range frags {
 		n += len(frag.html)
-		if n < len(frag.html) {
-			panic("htm: Join output length overflow")
-		}
 	}
 
 	var b strings.Builder
@@ -76,20 +73,20 @@ func Join(frags ...Safe) Safe {
 	for _, s := range frags {
 		b.WriteString(s.html)
 	}
-	return Safe{b.String()}
+	return HTML{b.String()}
 }
 
-func (c Safe) String() string {
+func (c HTML) String() string {
 	return c.html
 }
 
-func AsIs(a ...string) Safe {
-	return Safe{strings.Join(a, "")}
+func AsIs(a ...string) HTML {
+	return HTML{strings.Join(a, "")}
 }
 
 // Used to output HTML text, escaping HTML reserved characters <>&"
-func HTMLEncode(a string) Safe {
-	return Safe{html.EscapeString(a)}
+func HTMLEncode(a string) HTML {
+	return HTML{html.EscapeString(a)}
 }
 
 var URIComponentEncode = url.QueryEscape
@@ -101,6 +98,6 @@ var jsStringEscaper = strings.NewReplacer(
 	`\`, `\\`,
 )
 
-func JSStringEscape(a string) Safe {
-	return Safe{jsStringEscaper.Replace(a)}
+func JSStringEscape(a string) HTML {
+	return HTML{jsStringEscaper.Replace(a)}
 }

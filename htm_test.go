@@ -7,22 +7,22 @@ import (
 	"testing"
 )
 
-type Safe = htm.Safe
+type HTML = htm.HTML
 
 var E, V, A, J = htm.Element, htm.VoidElement, htm.Attributes, htm.Join
 var H, U, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
-var empty = Safe{}
+var empty = HTML{}
 
 func Test1(t *testing.T) {
-	//	var r Safe
+	//	var r HTML
 	for i := 0; i < 1000; i++ {
 		_ = E("html", A(`class`, `heh`, `data-href`, "sdsd?sds=1"),
 			E("body", "",
 				E("nav", A(`class`, "heh", `data-href`, "sdsd?sds=1"),
 					E("div", "",
-						E("ul", "", func() Safe {
+						E("ul", "", func() HTML {
 							l := 1000
-							result := make([]Safe, 0, l)
+							result := make([]HTML, 0, l)
 							for j := 0; j < l; j++ {
 								result = append(result,
 									E("li", A(`data-href`, U(`hj&"'>gjh`)+`&ha=`+U(`wdfw&`)+func() string {
