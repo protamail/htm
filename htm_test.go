@@ -11,7 +11,7 @@ type HTML = htm.HTML
 
 var E, V, A, J = htm.Element, htm.VoidElement, htm.Attributes, htm.Join
 var H, U, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
-var empty = htm.NewHTML("")
+var empty = HTML{}
 
 func Test1(t *testing.T) {
 	//	var r HTML
