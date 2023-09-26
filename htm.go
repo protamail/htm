@@ -59,6 +59,10 @@ func Join(frags ...HTML) HTML {
 		return HTML{}
 	case 1:
 		return frags[0]
+	case 2:
+		return HTML{frags[0].String() + frags[1].before, frags[1].body, frags[1].after}
+	case 3:
+		return HTML{frags[0].String() + frags[1].before, frags[1].body, frags[1].after + frags[2].String()}
 	}
 
 	var n int
@@ -83,7 +87,7 @@ func Join(frags ...HTML) HTML {
 }
 
 func (c HTML) String() string {
-	return strings.Join([]string{c.before, c.body, c.after}, "")
+	return c.before + c.body + c.after
 }
 
 func AsIs(a ...string) HTML {
