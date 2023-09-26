@@ -20,7 +20,7 @@ func Element(tag string, attr Attr, body ...Safe) Safe {
 	} else {
 		ss = append(ss, "<", tag, ">")
 	}
-	ss = append(ss, Join(body).html)
+	ss = append(ss, Join(body...).html)
 	ss = append(ss, "</", tag, ">")
 	return Safe{strings.Join(ss, "")}
 }
@@ -55,7 +55,7 @@ func VoidElement(tag string, attr Attr) Safe {
 	return Safe{strings.Join(r, "")}
 }*/
 
-func Join(frags []Safe) Safe {
+func Join(frags ...Safe) Safe {
 	switch len(frags) {
 	case 0:
 		return Safe{}

@@ -36,7 +36,7 @@ func Test1(t *testing.T) {
 									E("span", A("data-href", "ddd"), H("dsdsdsd")),
 								)
 							}
-							return J(result)
+							return J(result...)
 						}()),
 					),
 				),
