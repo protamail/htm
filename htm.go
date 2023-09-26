@@ -20,7 +20,7 @@ func Element(tag string, attr Attr, body ...Safe) Safe {
 	} else {
 		ss = append(ss, "<", tag, ">")
 	}
-	ss = append(ss, Join(body...).html)
+	ss = append(ss, Join(body).html)
 	ss = append(ss, "</", tag, ">")
 	return Safe{strings.Join(ss, "")}
 }
@@ -47,12 +47,36 @@ func VoidElement(tag string, attr Attr) Safe {
 	return Safe{"<" + tag + " " + string(attr) + "\n>"}
 }
 
-func Join(ss ...Safe) Safe {
+/*func Join(ss ...Safe) Safe {
 	r := make([]string, 0, len(ss))
 	for _, s := range ss {
 		r = append(r, s.html)
 	}
 	return Safe{strings.Join(r, "")}
+}*/
+
+func Join(frags []Safe) Safe {
+	switch len(frags) {
+	case 0:
+		return Safe{}
+	case 1:
+		return Safe{frags[0].html}
+	}
+
+	var n int
+	for _, frag := range frags {
+		n += len(frag.html)
+		if n < len(frag.html) {
+			panic("htm: Join output length overflow")
+		}
+	}
+
+	var b strings.Builder
+	b.Grow(n)
+	for _, s := range frags {
+		b.WriteString(s.html)
+	}
+	return Safe{b.String()}
 }
 
 func (c Safe) String() string {

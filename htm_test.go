@@ -1,7 +1,7 @@
 package htm_test
 
 import (
-	"fmt"
+	_ "fmt"
 	"github.com/protamail/htm"
 	"strconv"
 	"testing"
@@ -14,14 +14,14 @@ var H, U, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 var empty = Safe{}
 
 func Test1(t *testing.T) {
-	var r Safe
-	for i := 0; i < 10; i++ {
-		r = E("html", A(`class`, `heh`, `data-href`, "sdsd?sds=1"),
+	//	var r Safe
+	for i := 0; i < 1000; i++ {
+		_ = E("html", A(`class`, `heh`, `data-href`, "sdsd?sds=1"),
 			E("body", "",
 				E("nav", A(`class`, "heh", `data-href`, "sdsd?sds=1"),
 					E("div", "",
 						E("ul", "", func() Safe {
-							l := 10000
+							l := 1000
 							result := make([]Safe, 0, l)
 							for j := 0; j < l; j++ {
 								result = append(result,
@@ -36,12 +36,12 @@ func Test1(t *testing.T) {
 									E("span", A("data-href", "ddd"), H("dsdsdsd")),
 								)
 							}
-							return J(result...)
+							return J(result)
 						}()),
 					),
 				),
 			),
 		)
-		fmt.Println(r.String())
+		//		fmt.Println(r.String())
 	}
 }
