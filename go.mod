@@ -1,3 +1,3 @@
-module htm
+module github.com/protamail/htm
 
-go 1.19
+go 1.20

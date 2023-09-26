@@ -1,10 +1,8 @@
 package htm_test
 
 import (
-	"fmt"
-	"htm"
+	"github.com/protamail/htm"
 	"strconv"
-	_ "strings"
 	"testing"
 )
 
@@ -15,8 +13,6 @@ var H, U, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 var empty = Safe{}
 
 func Test1(t *testing.T) {
-	type sel map[bool]string
-	fmt.Println("ee=" + fmt.Sprintf("%#v", (sel{true: "1"}[false] == "")))
 //	var r Safe
 	for i := 0; i < 1000; i++ {
 		var collect Safe
@@ -30,6 +26,11 @@ func Test1(t *testing.T) {
 				}()), empty),
 				V("img", A(`src`, `img`+strconv.Itoa(j))),
 				V("br", ""),
+				E("span", A("data-href", "ddd"), H("dsdsdsd")),
+				E("span", A("data-href", "ddd"), H("dsdsdsd")),
+				E("span", A("data-href", "ddd"), H("dsdsdsd")),
+				E("span", A("data-href", "ddd"), H("dsdsdsd")),
+				E("span", A("data-href", "ddd"), H("dsdsdsd")),
 				E("span", A("data-href", "ddd"), H("dsdsdsd")),
 				V("br", ""),
 			)

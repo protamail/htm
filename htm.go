@@ -34,7 +34,11 @@ func Attributes(kv ...string) Attr {
 		if i > 1 {
 			ss = append(ss, ` `)
 		}
-		ss = append(ss, kv[i-1], `="`, attrEscaper.Replace(kv[i]), `"`)
+		v := kv[i]
+		if strings.Index(v, `"`) >= 0 {
+			v = attrEscaper.Replace(v)
+		}
+		ss = append(ss, kv[i-1], `="`, v, `"`)
 	}
 	return Attr(strings.Join(ss, ""))
 }
@@ -69,10 +73,6 @@ func HTMLEncode(a string) Safe {
 }
 
 var URIComponentEncode = url.QueryEscape
-
-//func URIComponentEncode(a string) Safe {
-//	return url.QueryEscape(a)
-//}
 
 var jsStringEscaper = strings.NewReplacer(
 	`"`, `\"`,
