@@ -56,10 +56,19 @@ func VoidElement(tag string, attr Attr) HTML {
 	return HTML{[]string{"<" + tag + " " + string(attr) + "\n>"}}
 }
 
-func Join(frags ...HTML) HTML {
+func Join(collect HTML, frags ...HTML) HTML {
 	var n int
 	for _, frag := range frags {
 		n += len(frag.pieces)
+	}
+	if cap(collect.pieces) < len(collect.pieces)+n {
+		var newPieces []string
+		if len(collect.pieces) > n {
+			newPieces = make([]string, 0, len(collect.pieces)*2)
+		} else {
+			newPieces = make([]string, 0, len(collect.pieces)+n)
+		}
+		collect.pieces = append(newPieces, collect.pieces...)
 	}
 
 	np := make([]string, 0, n)
