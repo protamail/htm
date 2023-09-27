@@ -17,9 +17,9 @@ func Element(tag string, attr Attr, body HTML) HTML {
 	var r HTML
 	switch len(body.pieces) {
 	case 0:
-		r = HTML{make([]string, 2, 2)}
+		r = HTML{make([]string, 1, 1)}
 	case 1:
-		r = HTML{[]string{"", body.pieces[0], ""}}
+		r = HTML{[]string{body.pieces[0]}}
 	case 2:
 		r = HTML{[]string{body.pieces[0], body.pieces[1]}}
 	default:
