@@ -19,9 +19,10 @@ func Element(tag string, attr Attr, body HTML) HTML {
 	case 0:
 		r = HTML{make([]string, 1, 1)}
 	case 1:
-		return HTML{[]string{"<" + tag + string(attr) + "\n>" + body.pieces[0] + "</" + tag + ">"}}
-	case 2:
-		r = HTML{[]string{body.pieces[0], body.pieces[1]}}
+		if len(body.pieces[0]) < 256 {
+			return HTML{[]string{"<" + tag + string(attr) + "\n>" + body.pieces[0] + "</" + tag + ">"}}
+		}
+		r = HTML{[]string{"", body.pieces[0], ""}}
 	default:
 		r = body
 	}
@@ -32,17 +33,44 @@ func Element(tag string, attr Attr, body HTML) HTML {
 
 var attrEscaper = strings.NewReplacer(`"`, `&quot;`, `<`, `&lt;`)
 
-func Attributes(kv ...string) Attr {
-	sar := make([]string, 0, len(kv)*5/2)
-	for i := 1; i < len(kv); i += 2 {
+func Prepend(doctype string, html HTML) HTML {
+	if len(html.pieces) > 0 {
+		html.pieces[0] = doctype + html.pieces[0]
+		return html
+	}
+	return HTML{[]string{doctype}}
+}
+
+func Attributes(nv ...string) Attr {
+	sar := make([]string, 0, len(nv)*5/2)
+	for i := 1; i < len(nv); i += 2 {
 		sar = append(sar, ` `)
-		v := kv[i]
+		v := nv[i]
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)
 		}
-		sar = append(sar, kv[i-1], `="`, v, `"`)
+		sar = append(sar, nv[i-1], `="`, v, `"`)
 	}
 	return Attr(strings.Join(sar, ""))
+}
+
+func JoinAttributes(attrs ...string) string {
+	return strings.Join(attrs, "")
+}
+
+func If[T string | HTML](cond bool, result T) T {
+	if cond {
+		return result
+	}
+	var r T
+	return r
+}
+
+func IfElse[T string | HTML](cond bool, ifR T, elseR T) T {
+	if cond {
+		return ifR
+	}
+	return elseR
 }
 
 // create HTML tag with no closing, e.g. <input type="text">
