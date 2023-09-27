@@ -8,26 +8,24 @@ import (
 
 // contains well-formed HTML fragment
 type HTML struct {
-	before string
-	body   string
-	after  string
+	pieces	[]string
 }
 
 func NewHTML(body string) HTML {
-	return HTML{"", body, ""}
+	return HTML{[]string{"", body, ""}}
 }
 
 type Attr string
 
 func Element(tag string, attr Attr, body HTML) HTML {
-	h := HTML{}
+	h := NewHTML("")
 	if len(attr) > 0 {
-		h.before = "<" + tag + " " + string(attr) + "\n>" + body.before
+		h.pieces[0] = "<" + tag + " " + string(attr) + "\n>" + body.pieces[0]
 	} else {
-		h.before = "<" + tag + ">" + body.before
+		h.pieces[0] = "<" + tag + ">" + body.pieces[0]
 	}
-	h.body = body.body
-	h.after = body.after + "</" + tag + ">"
+	h.pieces[1] = body.pieces[1]
+	h.pieces[2] = body.pieces[2] + "</" + tag + ">"
 	return h
 }
 
@@ -53,10 +51,12 @@ func VoidElement(tag string, attr Attr) HTML {
 	return NewHTML("<" + tag + " " + string(attr) + "\n>")
 }
 
+join ->creates flattened pieces array
+String() -> concats
 func Join(frags ...HTML) HTML {
 	switch len(frags) {
 	case 0:
-		return HTML{}
+		return NewHTML("")
 	case 1:
 		return frags[0]
 	}
