@@ -54,11 +54,21 @@ func Attributes(nv ...string) Attr {
 	return Attr(strings.Join(sar, ""))
 }
 
-func JoinAttributes(attrs ...string) string {
-	return strings.Join(attrs, "")
+func JoinAttributes(attrs ...Attr) Attr {
+	var n int
+	for _, attr := range attrs {
+		n += len(attr)
+	}
+
+	var b strings.Builder
+	b.Grow(n)
+	for _, attr := range attrs {
+		b.WriteString(string(attr))
+	}
+	return Attr(b.String())
 }
 
-func If[T string | HTML](cond bool, result T) T {
+func If[T ~string | HTML](cond bool, result T) T {
 	if cond {
 		return result
 	}
@@ -66,7 +76,7 @@ func If[T string | HTML](cond bool, result T) T {
 	return r
 }
 
-func IfElse[T string | HTML](cond bool, ifR T, elseR T) T {
+func IfElse[T ~string | HTML](cond bool, ifR T, elseR T) T {
 	if cond {
 		return ifR
 	}
@@ -75,7 +85,7 @@ func IfElse[T string | HTML](cond bool, ifR T, elseR T) T {
 
 // create HTML tag with no closing, e.g. <input type="text">
 func VoidElement(tag string, attr Attr) HTML {
-	return HTML{[]string{"<" + tag + " " + string(attr) + "\n>"}}
+	return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
 }
 
 func Append(collect HTML, frags ...HTML) HTML {
