@@ -19,17 +19,13 @@ func Element(tag string, attr Attr, body HTML) HTML {
 	case 0:
 		r = HTML{make([]string, 1, 1)}
 	case 1:
-		r = HTML{[]string{body.pieces[0]}}
+		return HTML{[]string{"<" + tag + string(attr) + "\n>" + body.pieces[0] + "</" + tag + ">"}}
 	case 2:
 		r = HTML{[]string{body.pieces[0], body.pieces[1]}}
 	default:
 		r = body
 	}
-	if len(attr) > 0 {
-		r.pieces[0] = "<" + tag + " " + string(attr) + "\n>" + r.pieces[0]
-	} else {
-		r.pieces[0] = "<" + tag + ">" + r.pieces[0]
-	}
+	r.pieces[0] = "<" + tag + string(attr) + "\n>" + r.pieces[0]
 	r.pieces[len(r.pieces)-1] += "</" + tag + ">"
 	return r
 }
@@ -39,9 +35,7 @@ var attrEscaper = strings.NewReplacer(`"`, `&quot;`, `<`, `&lt;`)
 func Attributes(kv ...string) Attr {
 	sar := make([]string, 0, len(kv)*5/2)
 	for i := 1; i < len(kv); i += 2 {
-		if i > 1 {
-			sar = append(sar, ` `)
-		}
+		sar = append(sar, ` `)
 		v := kv[i]
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)
