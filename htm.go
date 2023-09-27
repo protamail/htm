@@ -34,7 +34,7 @@ func Element(tag string, attr Attr, body HTML) HTML {
 	return r
 }
 
-var attrEscaper = strings.NewReplacer(`"`, `&quot;`) //, `<`, `&lt;`)
+var attrEscaper = strings.NewReplacer(`"`, `&quot;`, `<`, `&lt;`)
 
 func Attributes(kv ...string) Attr {
 	sar := make([]string, 0, len(kv)*5/2)
