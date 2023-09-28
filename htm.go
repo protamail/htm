@@ -76,11 +76,26 @@ func If[T ~string | HTML](cond bool, result T) T {
 	return r
 }
 
+func IfCall[T ~string | HTML](cond bool, call func() T) T {
+	if cond {
+		return call()
+	}
+	var r T
+	return r
+}
+
 func IfElse[T ~string | HTML](cond bool, ifR T, elseR T) T {
 	if cond {
 		return ifR
 	}
 	return elseR
+}
+
+func IfElseCall[T ~string | HTML](cond bool, ifCall func() T, elseCall func() T) T {
+	if cond {
+		return ifCall()
+	}
+	return elseCall()
 }
 
 // create HTML tag with no closing, e.g. <input type="text">
