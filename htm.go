@@ -45,11 +45,15 @@ func Attributes(nv ...string) Attr {
 	sar := make([]string, 0, len(nv)*5/2)
 	for i := 1; i < len(nv); i += 2 {
 		sar = append(sar, ` `)
-		v := nv[i]
+		k, v := nv[i-1], nv[i]
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)
 		}
-		sar = append(sar, nv[i-1], `="`, v, `"`)
+		if k[len(k)-1] == 61 {
+			sar = append(sar, k, `"`, v, `"`)
+		} else {
+			sar = append(sar, k, `="`, v, `"`)
+		}
 	}
 	return Attr(strings.Join(sar, ""))
 }
