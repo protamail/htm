@@ -31,7 +31,7 @@ func Element(tag string, attr Attr, body HTML) HTML {
 	return r
 }
 
-var attrEscaper = strings.NewReplacer(`"`, `&quot;`, `<`, `&lt;`)
+var attrEscaper = strings.NewReplacer(`"`, URIComponentEncode(`"`))
 
 func Prepend(doctype string, html HTML) HTML {
 	if len(html.pieces) > 0 {
@@ -44,7 +44,7 @@ func Prepend(doctype string, html HTML) HTML {
 func Attributes(nv ...string) Attr {
 	sar := make([]string, 0, len(nv)*5/2)
 	for i := 1; i < len(nv); i += 2 {
-		sar = append(sar, ` `)
+		sar = append(sar, " ")
 		k, v := nv[i-1], nv[i]
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)

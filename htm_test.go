@@ -16,23 +16,23 @@ var empty = HTML{}
 
 func Test1(t *testing.T) {
 	//var r HTML
-	/*
-		<html class="heh" data-href="sdsd?sds=1">
-			<body>
-				<nav class="heh" data-href="sdsd?sds=1">
-					<div>
-						<ul>
-							<li data-href="hj&'gjh&ha=wdfw eee"></li>
-							<img src="j">
-							<br>
-							<span data-href="ddd">dsdsdsd</span>
-							...
-						</ul>
-					</div>
-				</nav>
-			</body>
-		</html>
-	*/
+	//
+	//		<html class="heh" data-href="sdsd?sds=1">
+	//			<body>
+	//				<nav class="heh" data-href="sdsd?sds=1">
+	//					<div>
+	//						<ul>
+	//							<li data-href="hj&'gjh&ha=wdfw eee"></li>
+	//							<img src="j">
+	//							<br>
+	//							<span data-href="ddd">dsdsdsd</span>
+	//							...
+	//						</ul>
+	//					</div>
+	//				</nav>
+	//			</body>
+	//		</html>
+	//
 	for i := 0; i < 1000; i++ {
 		_ = _el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
 			_el("body", "",
@@ -47,7 +47,7 @@ func Test1(t *testing.T) {
 											return "&eee"
 										}
 										return ""
-									}()), empty),
+									}()), henc(printf("%d", j))),
 									_vel("img", attr("src=", printf("img%d", j))),
 									_vel("img", attr("src=", itoa(j))),
 									_vel(`img`, attr("src=", printf("img%.2f", float32(j)))),
@@ -76,7 +76,7 @@ func Test1(t *testing.T) {
 	var tpl bytes.Buffer
 	tmpl, _ := template.New("foo").Parse(`
 	{{range $idx, $e := .}}
-	<li><a href="/?page={{$idx}}{{$idx}}">{{$idx}}</a></li>
+	<li><a href="/?page={{$idx}}{{$idx}}">{{$idx}}{{$idx}}</a></li>
 	{{end}}
 	`)
 	//<li><a href="/?page={{$idx}}">{{$idx}}</a></li>
