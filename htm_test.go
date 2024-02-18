@@ -9,12 +9,17 @@ import (
 
 type HTML = htm.HTML
 
-var _el, _vel, attr, append = htm.Element, htm.VoidElement, htm.Attributes, htm.Append
+var _el, _vel, attr, _add = htm.Element, htm.VoidElement, htm.Attributes, htm.Append
 var printf, itoa = fmt.Sprintf, strconv.Itoa
 var henc, uenc, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
-var empty = HTML{}
 
 func Test1(t *testing.T) {
+	type a struct {
+		a string
+		b int64
+		c string
+	}
+	_ = a{b: 10}
 	//var r HTML
 	//
 	//		<html class="heh" data-href="sdsd?sds=1">
@@ -34,25 +39,28 @@ func Test1(t *testing.T) {
 	//		</html>
 	//
 	for i := 0; i < 1000; i++ {
-		_ = _el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
+		r := _el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
 			_el("body", "",
 				_el("nav", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
 					_el("div", "",
 						_el("ul", "", func() HTML {
 							var result HTML
 							for j := 0; j < 1000; j++ {
-								result = append(result,
+								_add(&result,
 									_el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
 										if true {
 											return "&eee"
 										}
 										return ""
-									}()), henc(printf("%d", j))),
-									_vel("img", attr("src=", printf("img%d", j))),
-									_vel("img", attr("src=", itoa(j))),
-									_vel(`img`, attr("src=", printf("img%.2f", float32(j)))),
-									_vel("br", ""),
-									_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd")),
+									}()),
+										henc(printf("%d", j)),
+										_vel("img", attr("src=", printf("img%d", j))),
+										_vel("img", attr("src=", itoa(j))),
+										_vel(`img`, attr("src=", printf("img%.2f", float32(j)))),
+										_vel("br", ""),
+										_el("div", ""),
+										_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd")),
+									),
 								)
 							}
 							return result
@@ -61,8 +69,73 @@ func Test1(t *testing.T) {
 				),
 			),
 		)
+		_ = r
 		//		fmt.Println(r.String())
 	}
+}
+
+func aTest2(t *testing.T) {
+	var buckets = []map[string]string{
+		{"bucket": "WLGCRU", "bucketName": "Wireline Growth & CRU"},
+		{"bucket": "TOTAL", "bucketName": "Total"},
+	}
+	var listHeader = func() HTML {
+		result :=
+			_el("tr", attr("class=", "tr-hdr trb-t trb-s trb-b narrow-font"),
+				_el("td", attr("class=", "tdb-l"), _vel("br", "")),
+				_el("td", "", I("PID")),
+				_el("td", "", I("RVP")),
+				_el("td", "", I("Sales Center")),
+				func() HTML {
+					var result HTML
+					for _, b := range buckets {
+						_add(&result, _el("td", "", henc(b["bucketName"])))
+					}
+					return result
+				}())
+		return result
+	}
+	fmt.Println(listHeader().String())
+	/*
+	   var listGroup = (arr, lastRegGroup) => !arr? false :
+
+	   	arr.map((i, idx) => Htm`<tr
+	   	    class="trb-s ${idx == arr.length-1 && ((i.rmtType == '2' || lastRegGroup) && 'trb-b' || 'trb-b-dot')} ${i.rmtType == '2' && ' tr-rollup'}">
+	   	    <td class="tdb-l">${format(rowNum++, '#')}</td>
+	   	    <td>${i.rmtid.length == 4 && i.rmtid}</td>
+	   	    <td>${i.parentName}</td>
+	   	    <td>${i.name}</td>
+	   	    ${t.bucket.map(b => {
+	   	        let q = t.quota[i.rmtid] && t.quota[i.rmtid][b.bucket];
+	   	        return Htm`<td ${i.rmtType != '2' && Htm`class="ptr ${q && q.quota < 0 && 'red' || 'blue'}" data-href="ajaxDoUpdate?rmtid=${encodeURIComponent(i.rmtid)}&bucket=${b.bucket}&field=quota&v=${q && q.quota || 0}#ShowInput"`}>
+	   	            ${q && format(q.quota, '0.000;;-')}</td>`;
+	   	    })}
+	   	</tr>`);
+
+	   return Htm`<table class="quota-input" style="table-layout: fixed">
+
+	   	<tr>
+	   	    <td class="width2"></td>
+	   	    <td class="width5"></td>
+	   	    <td class="width12"></td>
+	   	    <td class="width20"></td>
+	   	    ${t.bucket.map(b => Htm`<td class="width7"></td>`)}
+	   	</tr>
+	   	<tr class="tr-hdr-name"><td colspan="100">${t.currentOrg.name}<span class="note">(Enter in millions of dollars)</span></td></tr>
+	   	${listHeader()}
+	   	${!t.orgRollup.length && listGroup(t.orgRegMap[Object.keys(t.orgRegMap)[0]], true)}
+	   	${t.orgRollup.concat.apply([], t.orgRollup)
+	   	    .map((i, idx, arr) => listGroup(t.orgRegMap[`${i.idPath}${i.rmtid}|`], idx == arr.length - 1))}
+	   	${t.orgRollup.map(i => listGroup(i))}
+	   	${t.orgRollup.length > 0 && Htm`
+	   	    <tr class="trb-b"><td colspan="100"><br></td></tr>
+	   	    ${!rowNum++}
+	   	    ${listGroup([{rmtid: t.currentOrg.rmtid+'=', parentName: '', name: 'Control Total', rmtType: '1'}], true)}
+	   	    ${listGroup([{rmtid: 'check', parentName: '', name: 'Check', rmtType: '2'}])}
+	   	`}
+
+	   </table>`;
+	*/
 }
 
 /*

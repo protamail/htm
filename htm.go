@@ -13,8 +13,16 @@ type HTML struct {
 
 type Attr string
 
-func Element(tag string, attr Attr, body HTML) HTML {
+func Element(tag string, attr Attr, bodyEls ...HTML) HTML {
 	var r HTML
+	var body HTML
+	switch len(bodyEls) {
+	case 1:
+		body = bodyEls[0]
+	default:
+		Append(&body, bodyEls...)
+	}
+
 	switch len(body.pieces) {
 	case 0:
 		r = HTML{make([]string, 1, 1)}
@@ -60,15 +68,18 @@ func Attributes(nv ...string) Attr {
 
 func JoinAttributes(attrs ...Attr) Attr {
 	var n int
+
 	for _, attr := range attrs {
 		n += len(attr)
 	}
 
 	var b strings.Builder
 	b.Grow(n)
+
 	for _, attr := range attrs {
 		b.WriteString(string(attr))
 	}
+
 	return Attr(b.String())
 }
 
@@ -107,7 +118,7 @@ func VoidElement(tag string, attr Attr) HTML {
 	return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
 }
 
-func Append(collect HTML, frags ...HTML) HTML {
+func Append(collect *HTML, frags ...HTML) {
 	var n int
 	for _, frag := range frags {
 		n += len(frag.pieces)
@@ -125,7 +136,6 @@ func Append(collect HTML, frags ...HTML) HTML {
 	for _, frag := range frags {
 		collect.pieces = append(collect.pieces, frag.pieces...)
 	}
-	return collect
 }
 
 func (c HTML) String() string {
