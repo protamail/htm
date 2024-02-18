@@ -13,10 +13,15 @@ type HTML struct {
 
 type Attr string
 
+var voidEl = map[string]bool{"area": true, "base": true, "br": true, "col": true, "command": true, "embed": true, "hr": true, "img": true, "input": true, "keygen": true, "link": true, "meta": true, "source": true, "track": true, "wbr": true}
+
 func Element(tag string, attr Attr, bodyEls ...HTML) HTML {
-	var r HTML
-	var body HTML
+	var r, body HTML
 	switch len(bodyEls) {
+	case 0:
+		if voidEl[tag] {
+			return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
+		}
 	case 1:
 		body = bodyEls[0]
 	default:
@@ -113,11 +118,6 @@ func IfElseCall[T ~string | HTML](cond bool, ifCall func() T, elseCall func() T)
 	return elseCall()
 }
 
-// create HTML tag with no closing, e.g. <input type="text">
-func VoidElement(tag string, attr Attr) HTML {
-	return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
-}
-
 func Append(collect *HTML, frags ...HTML) {
 	var n int
 	for _, frag := range frags {
@@ -147,11 +147,19 @@ func AsIs(a ...string) HTML {
 }
 
 // Used to output HTML text, escaping HTML reserved characters <>&"
-func HTMLEncode(a string) HTML {
-	return HTML{[]string{html.EscapeString(a)}}
+func HTMLEncode(a ...string) HTML {
+	for i, el := range a {
+		a[i] = html.EscapeString(el)
+	}
+	return HTML{a}
 }
 
-var URIComponentEncode = url.QueryEscape
+func URIComponentEncode(a ...string) string {
+	for i, el := range a {
+		a[i] = url.QueryEscape(el)
+	}
+	return strings.Join(a, "")
+}
 
 var jsStringEscaper = strings.NewReplacer(
 	`"`, `\"`,
@@ -160,6 +168,10 @@ var jsStringEscaper = strings.NewReplacer(
 	`\`, `\\`,
 )
 
-func JSStringEscape(a string) HTML {
-	return HTML{[]string{jsStringEscaper.Replace(a)}}
+func JSStringEscape(a ...string) HTML {
+	for i, el := range a {
+		a[i] = jsStringEscaper.Replace(el)
+	}
+	return HTML{a}
 }
+

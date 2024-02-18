@@ -9,9 +9,9 @@ import (
 
 type HTML = htm.HTML
 
-var _el, _vel, attr, _add = htm.Element, htm.VoidElement, htm.Attributes, htm.Append
+var _el, attr, add = htm.Element, htm.Attributes, htm.Append
 var printf, itoa = fmt.Sprintf, strconv.Itoa
-var henc, uenc, I = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
+var henc, uenc, id = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 
 func Test1(t *testing.T) {
 	type a struct {
@@ -46,7 +46,7 @@ func Test1(t *testing.T) {
 						_el("ul", "", func() HTML {
 							var result HTML
 							for j := 0; j < 1000; j++ {
-								_add(&result,
+								add(&result,
 									_el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
 										if true {
 											return "&eee"
@@ -54,11 +54,11 @@ func Test1(t *testing.T) {
 										return ""
 									}()),
 										henc(printf("%d", j)),
-										_vel("img", attr("src=", printf("img%d", j))),
-										_vel("img", attr("src=", itoa(j))),
-										_vel(`img`, attr("src=", printf("img%.2f", float32(j)))),
-										_vel("br", ""),
-										_el("div", ""),
+										_el("img", attr("src=", printf("img%d", j))),
+										_el("img", attr("src=", itoa(j))),
+										_el(`img`, attr("src=", printf("img%.2f", float32(j)))),
+										_el("br", ""),
+										_el("div", "", henc("heh")),
 										_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd")),
 									),
 								)
@@ -70,7 +70,7 @@ func Test1(t *testing.T) {
 			),
 		)
 		_ = r
-		//		fmt.Println(r.String())
+		//fmt.Println(r.String())
 	}
 }
 
@@ -82,14 +82,14 @@ func aTest2(t *testing.T) {
 	var listHeader = func() HTML {
 		result :=
 			_el("tr", attr("class=", "tr-hdr trb-t trb-s trb-b narrow-font"),
-				_el("td", attr("class=", "tdb-l"), _vel("br", "")),
-				_el("td", "", I("PID")),
-				_el("td", "", I("RVP")),
-				_el("td", "", I("Sales Center")),
+				_el("td", attr("class=", "tdb-l"), _el("br", "")),
+				_el("td", "", id("PID")),
+				_el("td", "", id("RVP")),
+				_el("td", "", id("Sales Center")),
 				func() HTML {
 					var result HTML
 					for _, b := range buckets {
-						_add(&result, _el("td", "", henc(b["bucketName"])))
+						add(&result, _el("td", "", henc(b["bucketName"])))
 					}
 					return result
 				}())
