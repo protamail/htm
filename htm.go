@@ -19,6 +19,7 @@ func Element(tag string, attr Attr, bodyEls ...HTML) HTML {
 	var r, body HTML
 	switch len(bodyEls) {
 	case 0:
+		//if strings.Index("area,base,br,col,command,embed,hr,img,input,keygen,link,meta,source,track,wbr", tag) != -1 { //voidEl[tag] {
 		if voidEl[tag] {
 			return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
 		}
@@ -62,7 +63,7 @@ func Attributes(nv ...string) Attr {
 		if strings.Index(v, `"`) >= 0 {
 			v = attrEscaper.Replace(v)
 		}
-		if k[len(k)-1] == 61 {
+		if k[len(k)-1] == 61 { //if already ends with =
 			sar = append(sar, k, `"`, v, `"`)
 		} else {
 			sar = append(sar, k, `="`, v, `"`)
@@ -143,23 +144,15 @@ func (c HTML) String() string {
 }
 
 func AsIs(a ...string) HTML {
-	return HTML{[]string{strings.Join(a, "")}}
-}
-
-// Used to output HTML text, escaping HTML reserved characters <>&"
-func HTMLEncode(a ...string) HTML {
-	for i, el := range a {
-		a[i] = html.EscapeString(el)
-	}
 	return HTML{a}
 }
 
-func URIComponentEncode(a ...string) string {
-	for i, el := range a {
-		a[i] = url.QueryEscape(el)
-	}
-	return strings.Join(a, "")
+// Used to output HTML text, escaping HTML reserved characters <>&"
+func HTMLEncode(a string) HTML {
+	return HTML{[]string{html.EscapeString(a)}}
 }
+
+var URIComponentEncode = url.QueryEscape
 
 var jsStringEscaper = strings.NewReplacer(
 	`"`, `\"`,
@@ -168,10 +161,6 @@ var jsStringEscaper = strings.NewReplacer(
 	`\`, `\\`,
 )
 
-func JSStringEscape(a ...string) HTML {
-	for i, el := range a {
-		a[i] = jsStringEscaper.Replace(el)
-	}
-	return HTML{a}
+func JSStringEscape(a string) HTML {
+	return HTML{[]string{jsStringEscaper.Replace(a)}}
 }
-

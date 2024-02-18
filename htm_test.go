@@ -39,36 +39,37 @@ func Test1(t *testing.T) {
 	//		</html>
 	//
 	for i := 0; i < 1000; i++ {
-		r := _el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
-			_el("body", "",
-				_el("nav", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
-					_el("div", "",
-						_el("ul", "", func() HTML {
-							var result HTML
-							for j := 0; j < 1000; j++ {
-								add(&result,
-									_el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
-										if true {
-											return "&eee"
-										}
-										return ""
-									}()),
-										henc(printf("%d", j)),
-										_el("img", attr("src=", printf("img%d", j))),
-										_el("img", attr("src=", itoa(j))),
-										_el(`img`, attr("src=", printf("img%.2f", float32(j)))),
-										_el("br", ""),
-										_el("div", "", henc("heh")),
-										_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd")),
-									),
-								)
-							}
-							return result
-						}()),
+		r :=
+			_el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
+				_el("body", "",
+					_el("nav", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
+						_el("div", "",
+							_el("ul", "", func() HTML {
+								var result HTML
+								for j := 0; j < 1000; j++ {
+									add(&result,
+										_el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
+											if true {
+												return "&eee"
+											}
+											return ""
+										}()),
+											henc(printf("%d", j)),
+											_el("img", attr("src=", printf("img%d", j))),
+											_el("img", attr("src=", itoa(j))),
+											_el(`img`, attr("src=", printf("img%.2f", float32(j)))),
+											_el("br", ""),
+											_el("div", "", henc("heh"), id("da"), henc("boom")),
+											_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd")),
+										),
+									)
+								}
+								return result
+							}()),
+						),
 					),
 				),
-			),
-		)
+			)
 		_ = r
 		//fmt.Println(r.String())
 	}
