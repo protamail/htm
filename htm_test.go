@@ -14,12 +14,6 @@ var printf, itoa = fmt.Sprintf, strconv.Itoa
 var henc, uenc, id = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 
 func Test1(t *testing.T) {
-	type a struct {
-		a string
-		b int64
-		c string
-	}
-	_ = a{b: 10}
 	//var r HTML
 	//
 	//		<html class="heh" data-href="sdsd?sds=1">
@@ -38,16 +32,17 @@ func Test1(t *testing.T) {
 	//			</body>
 	//		</html>
 	//
+	a := make([]string, 1000, 1000)
 	for i := 0; i < 1000; i++ {
 		r :=
 			_el("html", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
 				_el("body", "",
 					_el("nav", attr("class=", "heh", "data-href=", "sdsd?sds=1"),
 						_el("div", "",
-							_el("ul", "", func() HTML {
-								var result HTML
+							/*_el("ul", "", func() HTML {
+								var result = htm.NewHTML(1000)
 								for j := 0; j < 1000; j++ {
-									add(&result,
+									result = add(result,
 										_el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
 											if true {
 												return "&eee"
@@ -65,13 +60,29 @@ func Test1(t *testing.T) {
 									)
 								}
 								return result
-							}()),
+							}()),*/
+							_el("ul", "", htm.Map(a, func(j int) HTML {
+								return _el("li", attr("data-href=", uenc(`hj&"'>gjh`)+`&ha=`+uenc(`wdfw&`)+func() string {
+									if true {
+										return "&eee"
+									}
+									return ""
+								}()),
+									henc(printf("%d", j)),
+									_el("img", attr("src=", printf("img%d", j))),
+									_el("img", attr("src=", itoa(j))),
+									_el(`img`, attr("src=", printf("img%.2f", float32(j)))),
+									_el("br", ""),
+									_el("div", "", henc("heh"), id("da"), henc("boom")),
+									_el("span", attr("data-href", "ddd"), henc("dsdsi&dsd"), henc(a[j])),
+								)
+							})),
 						),
 					),
 				),
 			)
 		_ = r
-		//fmt.Println(r.String())
+		//		fmt.Println(r.String())
 	}
 }
 
@@ -90,7 +101,7 @@ func aTest2(t *testing.T) {
 				func() HTML {
 					var result HTML
 					for _, b := range buckets {
-						add(&result, _el("td", "", henc(b["bucketName"])))
+						result = add(result, _el("td", "", henc(b["bucketName"])))
 					}
 					return result
 				}())

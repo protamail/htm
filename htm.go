@@ -15,18 +15,21 @@ type Attr string
 
 var voidEl = map[string]bool{"area": true, "base": true, "br": true, "col": true, "command": true, "embed": true, "hr": true, "img": true, "input": true, "keygen": true, "link": true, "meta": true, "source": true, "track": true, "wbr": true}
 
+func NewHTML(cap int) HTML {
+	return HTML{make([]string, 0, cap)}
+}
+
 func Element(tag string, attr Attr, bodyEls ...HTML) HTML {
 	var r, body HTML
 	switch len(bodyEls) {
 	case 0:
-		//if strings.Index("area,base,br,col,command,embed,hr,img,input,keygen,link,meta,source,track,wbr", tag) != -1 { //voidEl[tag] {
-		if voidEl[tag] {
+		if voidEl[tag] || voidEl[strings.ToLower(tag)] {
 			return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
 		}
 	case 1:
 		body = bodyEls[0]
 	default:
-		Append(&body, bodyEls...)
+		body = Append(body, bodyEls...)
 	}
 
 	switch len(body.pieces) {
@@ -89,6 +92,14 @@ func JoinAttributes(attrs ...Attr) Attr {
 	return Attr(b.String())
 }
 
+func Map[T any](a []T, f func(int) HTML) HTML {
+	r := NewHTML(len(a))
+	for i := range a {
+		r = Append(r, f(i))
+	}
+	return r
+}
+
 func If[T ~string | HTML](cond bool, result T) T {
 	if cond {
 		return result
@@ -119,7 +130,7 @@ func IfElseCall[T ~string | HTML](cond bool, ifCall func() T, elseCall func() T)
 	return elseCall()
 }
 
-func Append(collect *HTML, frags ...HTML) {
+func Append(collect HTML, frags ...HTML) HTML {
 	var n int
 	for _, frag := range frags {
 		n += len(frag.pieces)
@@ -137,6 +148,7 @@ func Append(collect *HTML, frags ...HTML) {
 	for _, frag := range frags {
 		collect.pieces = append(collect.pieces, frag.pieces...)
 	}
+	return collect
 }
 
 func (c HTML) String() string {
