@@ -14,6 +14,12 @@ var printf, itoa = fmt.Sprintf, strconv.Itoa
 var henc, uenc, id = htm.HTMLEncode, htm.URIComponentEncode, htm.AsIs
 
 func Test1(t *testing.T) {
+	type B struct {
+		a string
+		B int
+	}
+	var b = B{"heh", 2}
+	fmt.Printf(htm.See(1, b))
 	//var r HTML
 	//
 	//		<html class="heh" data-href="sdsd?sds=1">

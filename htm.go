@@ -1,6 +1,7 @@
 package htm
 
 import (
+	"fmt"
 	"html"
 	"net/url"
 	"strings"
@@ -90,6 +91,12 @@ func JoinAttributes(attrs ...Attr) Attr {
 	}
 
 	return Attr(b.String())
+}
+
+func See(what ...any) string {
+	return Map(what, func(i int) HTML {
+		return HTML{[]string{fmt.Sprintf("%+v\n", what[i])}}
+	}).String()
 }
 
 func Map[T any](a []T, f func(int) HTML) HTML {
