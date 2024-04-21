@@ -61,6 +61,9 @@ func Prepend(doctype string, html HTML) HTML {
 
 func Attributes(nv ...string) Attr {
 	sar := make([]string, 0, len(nv)*5/2)
+	if len(nv) % 2 > 0 {
+		panic("Attributes(...) expects even number of arguments")
+	}
 	for i := 1; i < len(nv); i += 2 {
 		sar = append(sar, " ")
 		k, v := nv[i-1], nv[i]
@@ -69,7 +72,9 @@ func Attributes(nv ...string) Attr {
 		}
 		if k[len(k)-1] == 61 { //if already ends with =
 			sar = append(sar, k, `"`, v, `"`)
-		} else { //if attr key is not ending with =, output bare attrribute discarding the value
+		} else {
+			//if attr key is not ending with =, output bare or as-is attribute discarding the value
+			//e.g. attr("diabled", ""), or attr(`rel="icon"`, "")
 			sar = append(sar, k)
 		}
 	}
