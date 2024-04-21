@@ -163,6 +163,10 @@ func Append(collect HTML, frags ...HTML) HTML {
 	return collect
 }
 
+func (c HTML) IsEmpty() bool {
+	return len(c.pieces) == 0
+}
+
 func (c HTML) String() string {
 	return strings.Join(c.pieces, "")
 }
