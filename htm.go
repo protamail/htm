@@ -20,7 +20,7 @@ func NewHTML(cap int) HTML {
 	return HTML{make([]string, 0, cap)}
 }
 
-func Element(tag string, attr Attr, bodyEls ...HTML) HTML {
+func NewElem(tag string, attr Attr, bodyEls ...HTML) HTML {
 	var r, body HTML
 	switch len(bodyEls) {
 	case 0:
@@ -59,10 +59,10 @@ func Prepend(doctype string, html HTML) HTML {
 	return HTML{[]string{doctype}}
 }
 
-func Attributes(nv ...string) Attr {
+func NewAttr(nv ...string) Attr {
 	sar := make([]string, 0, len(nv)*5/2)
-	if len(nv) % 2 > 0 {
-		panic("Attributes(...) expects even number of arguments")
+	if len(nv)%2 > 0 {
+		panic("NewAttr(...) expects even number of arguments")
 	}
 	for i := 1; i < len(nv); i += 2 {
 		sar = append(sar, " ")
@@ -81,7 +81,7 @@ func Attributes(nv ...string) Attr {
 	return Attr(strings.Join(sar, ""))
 }
 
-func JoinAttributes(attrs ...Attr) Attr {
+func JoinAttr(attrs ...Attr) Attr {
 	var n int
 
 	for _, attr := range attrs {
