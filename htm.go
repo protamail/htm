@@ -69,8 +69,8 @@ func Attributes(nv ...string) Attr {
 		}
 		if k[len(k)-1] == 61 { //if already ends with =
 			sar = append(sar, k, `"`, v, `"`)
-		} else {
-			sar = append(sar, k, `="`, v, `"`)
+		} else { //if attr key is not ending with =, output bare attrribute discarding the value
+			sar = append(sar, k)
 		}
 	}
 	return Attr(strings.Join(sar, ""))
