@@ -20,6 +20,7 @@ func Test1(t *testing.T) {
 	}
 	var b = B{"heh", 2}
 	fmt.Printf(htm.See(1, b))
+
 	//var r Result
 	//
 	//		<html class="heh" data-href="sdsd?sds=1">
