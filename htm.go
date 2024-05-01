@@ -8,7 +8,7 @@ import (
 )
 
 // contains well-formed HTML fragment
-type HTML struct {
+type Result struct {
 	pieces []string
 }
 
@@ -16,16 +16,16 @@ type Attr string
 
 var voidEl = map[string]bool{"area": true, "base": true, "br": true, "col": true, "command": true, "embed": true, "hr": true, "img": true, "input": true, "keygen": true, "link": true, "meta": true, "source": true, "track": true, "wbr": true}
 
-func NewHTML(cap int) HTML {
-	return HTML{make([]string, 0, cap)}
+func NewHTML(cap int) Result {
+	return Result{make([]string, 0, cap)}
 }
 
-func NewElem(tag string, attr Attr, bodyEls ...HTML) HTML {
-	var r, body HTML
+func NewElem(tag string, attr Attr, bodyEls ...Result) Result {
+	var r, body Result
 	switch len(bodyEls) {
 	case 0:
 		if voidEl[tag] || voidEl[strings.ToLower(tag)] {
-			return HTML{[]string{"<" + tag + string(attr) + "\n>"}}
+			return Result{[]string{"<" + tag + string(attr) + "\n>"}}
 		}
 	case 1:
 		body = bodyEls[0]
@@ -35,12 +35,12 @@ func NewElem(tag string, attr Attr, bodyEls ...HTML) HTML {
 
 	switch len(body.pieces) {
 	case 0:
-		r = HTML{make([]string, 1, 1)}
+		r = Result{make([]string, 1, 1)}
 	case 1:
 		if len(body.pieces[0]) < 256 {
-			return HTML{[]string{"<" + tag + string(attr) + "\n>" + body.pieces[0] + "</" + tag + ">"}}
+			return Result{[]string{"<" + tag + string(attr) + "\n>" + body.pieces[0] + "</" + tag + ">"}}
 		}
-		r = HTML{[]string{"", body.pieces[0], ""}}
+		r = Result{[]string{"", body.pieces[0], ""}}
 	default:
 		r = body
 	}
@@ -51,12 +51,12 @@ func NewElem(tag string, attr Attr, bodyEls ...HTML) HTML {
 
 var attrEscaper = strings.NewReplacer(`"`, URIComponentEncode(`"`))
 
-func Prepend(doctype string, html HTML) HTML {
+func Prepend(doctype string, html Result) Result {
 	if len(html.pieces) > 0 {
 		html.pieces[0] = doctype + html.pieces[0]
 		return html
 	}
-	return HTML{[]string{doctype}}
+	return Result{[]string{doctype}}
 }
 
 func NewAttr(nv ...string) Attr {
@@ -99,12 +99,12 @@ func JoinAttr(attrs ...Attr) Attr {
 }
 
 func See(what ...any) string {
-	return Map(what, func(i int) HTML {
-		return HTML{[]string{fmt.Sprintf("%+v\n", what[i])}}
+	return Map(what, func(i int) Result {
+		return Result{[]string{fmt.Sprintf("%+v\n", what[i])}}
 	}).String()
 }
 
-func Map[T any](a []T, f func(int) HTML) HTML {
+func Map[T any](a []T, f func(int) Result) Result {
 	r := NewHTML(len(a))
 	for i := range a {
 		r = Append(r, f(i))
@@ -112,7 +112,7 @@ func Map[T any](a []T, f func(int) HTML) HTML {
 	return r
 }
 
-func If[T ~string | HTML](cond bool, result T) T {
+func If[T ~string | Result](cond bool, result T) T {
 	if cond {
 		return result
 	}
@@ -120,7 +120,7 @@ func If[T ~string | HTML](cond bool, result T) T {
 	return r
 }
 
-func IfCall[T ~string | HTML](cond bool, call func() T) T {
+func IfCall[T ~string | Result](cond bool, call func() T) T {
 	if cond {
 		return call()
 	}
@@ -128,21 +128,21 @@ func IfCall[T ~string | HTML](cond bool, call func() T) T {
 	return r
 }
 
-func IfElse[T ~string | HTML](cond bool, ifR T, elseR T) T {
+func IfElse[T ~string | Result](cond bool, ifR T, elseR T) T {
 	if cond {
 		return ifR
 	}
 	return elseR
 }
 
-func IfElseCall[T ~string | HTML](cond bool, ifCall func() T, elseCall func() T) T {
+func IfElseCall[T ~string | Result](cond bool, ifCall func() T, elseCall func() T) T {
 	if cond {
 		return ifCall()
 	}
 	return elseCall()
 }
 
-func Append(collect HTML, frags ...HTML) HTML {
+func Append(collect Result, frags ...Result) Result {
 	var n int
 	for _, frag := range frags {
 		n += len(frag.pieces)
@@ -163,21 +163,21 @@ func Append(collect HTML, frags ...HTML) HTML {
 	return collect
 }
 
-func (c HTML) IsEmpty() bool {
+func (c Result) IsEmpty() bool {
 	return len(c.pieces) == 0
 }
 
-func (c HTML) String() string {
+func (c Result) String() string {
 	return strings.Join(c.pieces, "")
 }
 
-func AsIs(a ...string) HTML {
-	return HTML{a}
+func AsIs(a ...string) Result {
+	return Result{a}
 }
 
 // Used to output HTML text, escaping HTML reserved characters <>&"
-func HTMLEncode(a string) HTML {
-	return HTML{[]string{html.EscapeString(a)}}
+func HTMLEncode(a string) Result {
+	return Result{[]string{html.EscapeString(a)}}
 }
 
 var URIComponentEncode = url.QueryEscape
@@ -189,6 +189,6 @@ var jsStringEscaper = strings.NewReplacer(
 	`\`, `\\`,
 )
 
-func JSStringEscape(a string) HTML {
-	return HTML{[]string{jsStringEscaper.Replace(a)}}
+func JSStringEscape(a string) Result {
+	return Result{[]string{jsStringEscaper.Replace(a)}}
 }
